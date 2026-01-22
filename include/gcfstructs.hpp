@@ -37,7 +37,7 @@ namespace gcf{
 
     struct cache_descriptor{
         descriptor_version version_desc; // always 1
-        cache_type cache_type; // always 1
+        cache_type type; // always 1
         std::uint32_t cache_version; // up to 6
         std::uint32_t appid; // always 1
         std::uint32_t app_version_id;

@@ -480,7 +480,7 @@ void cc_makegcf(argparse::ArgumentParser& args){
 	}
 	
 	if (frag_idx != total_blocks){
-		throw std::exception(std::format("undersized fragmentation data: {} {}", frag_idx, total_blocks).c_str());
+		throw std::runtime_error(std::format("undersized fragmentation data: {} {}", frag_idx, total_blocks).c_str());
 	}
 
 	//
@@ -559,6 +559,7 @@ void cc_makegcf(argparse::ArgumentParser& args){
 
 int main(int argc, const char* argv[]) {
 	w32::enable_truecolor();
+	int exit_code = 0;
 	argparse::ArgumentParser program(argv[0]);
 
 	using callback_fn = std::function<void(argparse::ArgumentParser&)>;
@@ -755,19 +756,26 @@ int main(int argc, const char* argv[]) {
 
 	try {
 		program.parse_args(argc, argv);
+
+		bool found = false;
 		for (auto& i : parsers) {
-			if (program.is_subcommand_used(i.p)) { 
+			if (program.is_subcommand_used(i.p)) {
 				i.f(i.p);
+				found = true;
 				break;
-			};
+			}
+		}
+
+		if (!found) {
+			std::cout << program;
+			exit_code = 1;
 		}
 	} catch (const std::exception& err) {
 		std::cout << err.what() << std::endl;
 		std::cout << program;
-		w32::disable_truecolor();
-		return 1;
+		exit_code = 1;
 	}
 
 	w32::disable_truecolor();
-	return 0;
+	return exit_code;
 }
